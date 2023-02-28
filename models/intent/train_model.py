@@ -1,7 +1,7 @@
 # 필요한 모듈 임포트
 import pandas as pd
 import tensorflow as tf
-from keras import preprocessing      # 원래 from tensorflow.keras import preprocessing (라이브러리 import 문제로 변경함)
+from keras import preprocessing # 원래 from tensorflow.keras import preprocessing (라이브러리 import 문제로 변경함)
 from tensorflow.python.keras.models import Model      # 원래 from tensorflow.keras.models import Model (라이브러리 import 문제로 변경함)
 from tensorflow.python.keras.layers import Input, Embedding, Dense, Dropout, Conv1D, GlobalMaxPool1D, concatenate      # 원래 from tensorflow.keras.layers import ... (라이브러리 import 문제로 변경함)
 
@@ -25,7 +25,8 @@ for sentence in queries:
 # 단어 인덱스 시퀀스 벡터 생성
 # 단어 시퀀스 벡터 크기
 from config.GlobalParams import MAX_SEQ_LEN
-padded_seqs = preprocessing.sequence.pad_sequences(sequences, maxlen=MAX_SEQ_LEN, padding='post')
+from keras_preprocessing.sequence import pad_sequences # 원래 line 4로 아래 코드 진행해야함
+padded_seqs = pad_sequences(sequences, maxlen=MAX_SEQ_LEN, padding='post') # 원래 preprocessing.sequence.pad_sequences(...)
 
 # 학습용, 검증용, 테스트용 데이터셋 생성
 # 학습셋:검증셋:테스트셋 = 7:2:1
@@ -78,10 +79,10 @@ concat = concatenate([pool1, pool2, pool3])
 hidden = Dense(128, activation=tf.nn.relu)(concat)
 dropout_hidden = Dropout(rate=dropout_prob)(hidden)
 logits = Dense(5, name='logits')(dropout_hidden)
-predictions = Dense(5, activation=tf.nn.softmax(logits))
+predictions = Dense(5, activation=tf.nn.softmax)(logits)
 
 # 모델 생성
-model = Model(inputs=input_layer, ouputs=predictions)
+model = Model(inputs=input_layer, outputs=predictions)
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
 # 모델 학습
